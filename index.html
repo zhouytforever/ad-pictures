@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ad-Pictures</title>
+    <style>
+        body, div, ul, li, a, img {
+            margin: 0;
+            padding: 0;
+        }
+
+        div.box {
+            margin-top: 20px;
+            position: relative;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0px;
+            width: 490px;
+            height: 170px;
+        }
+
+        .pic-list-box {
+            border: 5px solid coral;
+            display: block;
+            overflow: hidden;
+            width: 490px;
+            height: 170px;
+            padding: 0px;
+            border-radius: 10px;
+            margin: 0px;
+        }
+
+        #pic-list-ul {
+            position: relative;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        ul.num-list {
+            position: absolute;
+            right: -5px;
+            bottom: 5px;
+        }
+
+        ul.num-list li {
+            float: left;
+            margin-right: 5px;
+            width: 20px;
+            height: 20px;
+            -webkit-border-radius: 20px;
+            -moz-border-radius: 20px;
+            border-radius: 20px;
+            background-color: coral;
+            text-align: center;
+            line-height: 20px;
+            opacity: 0.7;
+
+        }
+
+        ul.num-list li.current {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+<div class="box">
+    <div class="pic-list-box">
+        <ul id="pic-list-ul">
+            <li><a href="#"><img src="img/01.jpg" alt=""></a></li>
+            <li><a href="#"><img src="img/02.jpg" alt=""></a></li>
+            <li><a href="#"><img src="img/03.jpg" alt=""></a></li>
+            <li><a href="#"><img src="img/04.jpg" alt=""></a></li>
+            <li><a href="#"><img src="img/05.jpg" alt=""></a></li>
+        </ul>
+    </div>
+    <ul class="num-list" id="num-list">
+        <li class="current">1</li>
+        <li>2</li>
+        <li>3</li>
+        <li>4</li>
+        <li>5</li>
+    </ul>
+</div>
+<script>
+    const get = (selector) => {
+        if (typeof selector === "string") {
+            switch (selector.charAt(0)) {
+                case '#':
+                    return document.getElementById(selector.substring(1));
+                case '.':
+                    return document.getElementsByClassName(selector.substring(1));
+                default:
+                    return document.getElementsByTagName(selector);
+            }
+        } else {
+            throw new Error("error type of selector");
+        }
+    }
+
+    class Ads {
+        constructor() {
+            this.picsUl = get("#pic-list-ul");
+            this.numsUl = get("#num-list");
+            this.activeIndex = 0;
+            this.oldIndex = 0;
+            let that = this;
+            this.timer = null;
+
+            this.createTimer();
+
+            get("#num-list").onmousemove = (e) => {
+                e = e || window.event;
+                let id = e.target.childNodes[0].nodeValue;
+                that.clearTimer();
+                if (id - 1 != that.activeIndex ) {
+                    this.activeNum(id - 1);
+                    this.activePic(id - 1);
+                }
+            }
+
+            get("#num-list").onmouseout = () => {
+                that.createTimer();
+            }
+        }
+
+        activeNum(index) {
+            Array.prototype.forEach.call(this.numsUl.children, (item) => {
+                item.className = "";
+            });
+            this.numsUl.children[index].className = "current";
+        }
+
+        activePic(current) {
+            let step = this.picsUl.children[0].offsetHeight * (current - this.oldIndex) / 10;
+            let baseTop = this.picsUl.children[0].offsetHeight * this.oldIndex;
+            let times = 1;
+            let timer = setInterval(() => {
+                if (times > 10) {
+                    clearInterval(timer);
+                } else {
+                    this.picsUl.style.top = -baseTop - step * (times++) + 'px';
+                }
+            }, 60);
+            this.oldIndex = this.activeIndex;
+            this.activeIndex = current;
+
+        }
+
+        clearTimer() {
+            window.clearInterval(this.timer);
+        }
+
+        createTimer() {
+            let maxIndex = this.picsUl.children.length;
+            let that = this;
+            this.timer = setInterval(() => {
+                let current = ++that.activeIndex % maxIndex;
+                that.activeNum(current);
+                that.activePic(current);
+            }, 3000);
+        }
+    }
+
+    const ads = new Ads();
+    window.onunload = () => {
+        ads.clearTimer();
+    }
+</script>
+</body>
+</html>
