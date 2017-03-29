@@ -32,6 +32,8 @@
 
         #pic-list-ul {
             position: relative;
+            transition: top 1s ease-out;
+            top: 0px;
         }
 
         ul {
@@ -105,8 +107,7 @@
         constructor() {
             this.picsUl = get("#pic-list-ul");
             this.numsUl = get("#num-list");
-            this.activeIndex = 0;
-            this.oldIndex = 0;
+            this.currentIndex = 0;
             let that = this;
             this.timer = null;
 
@@ -116,9 +117,9 @@
                 e = e || window.event;
                 let id = e.target.childNodes[0].nodeValue;
                 that.clearTimer();
-                if (id - 1 != that.activeIndex ) {
+                if (id - 1 != that.currentIndex) {
                     this.activeNum(id - 1);
-                    this.activePic(id - 1);
+                    this.moveTo(id - 1);
                 }
             }
 
@@ -134,20 +135,10 @@
             this.numsUl.children[index].className = "current";
         }
 
-        activePic(current) {
-            let step = this.picsUl.children[0].offsetHeight * (current - this.oldIndex) / 10;
-            let baseTop = this.picsUl.children[0].offsetHeight * this.oldIndex;
-            let times = 1;
-            let timer = setInterval(() => {
-                if (times > 10) {
-                    clearInterval(timer);
-                } else {
-                    this.picsUl.style.top = -baseTop - step * (times++) + 'px';
-                }
-            }, 60);
-            this.oldIndex = this.activeIndex;
-            this.activeIndex = current;
-
+        moveTo(index) {
+            let baseTop = this.picsUl.children[0].offsetHeight * index;
+            this.picsUl.style.top = -baseTop + 'px';
+            this.currentIndex = index;
         }
 
         clearTimer() {
@@ -158,9 +149,9 @@
             let maxIndex = this.picsUl.children.length;
             let that = this;
             this.timer = setInterval(() => {
-                let current = ++that.activeIndex % maxIndex;
+                let current = (that.currentIndex + 1) % maxIndex;
                 that.activeNum(current);
-                that.activePic(current);
+                that.moveTo(current);
             }, 3000);
         }
     }
