@@ -106,25 +106,27 @@
             this.picsUl = get("#pic-list-ul");
             this.numsUl = get("#num-list");
             this.activeIndex = 0;
-            this.oldIndex = 0;
             let that = this;
             this.timer = null;
 
             this.createTimer();
 
-            get("#num-list").onmousemove = (e) => {
-                e = e || window.event;
-                let id = e.target.childNodes[0].nodeValue;
-                that.clearTimer();
-                if (id - 1 != that.activeIndex ) {
-                    this.activeNum(id - 1);
-                    this.activePic(id - 1);
-                }
-            }
+            Array.prototype.forEach.call(get("#num-list").childNodes, (item) => {
+                item.onmouseover = (e) => {
+                    e = e || window.event;
+                    let id = e.target.childNodes[0].nodeValue;
+                    that.clearTimer();
+                    if (id - 1 != that.activeIndex) {
+                        this.activeNum(id - 1);
+                        this.moveTo(id - 1);
+                    }
+                };
 
-            get("#num-list").onmouseout = () => {
-                that.createTimer();
-            }
+                item.onmouseout = (e) => {
+                    that.createTimer();
+                }
+            })
+
         }
 
         activeNum(index) {
@@ -134,20 +136,20 @@
             this.numsUl.children[index].className = "current";
         }
 
-        activePic(current) {
-            let step = this.picsUl.children[0].offsetHeight * (current - this.oldIndex) / 10;
-            let baseTop = this.picsUl.children[0].offsetHeight * this.oldIndex;
+        moveTo(index) {
+            let step = this.picsUl.children[0].offsetHeight * (index - this.activeIndex) / 10;
+            let baseTop = this.picsUl.children[0].offsetHeight * this.activeIndex;
             let times = 1;
+            let timeLang = 60;
             let timer = setInterval(() => {
                 if (times > 10) {
                     clearInterval(timer);
+                    timeLang = 60;
                 } else {
                     this.picsUl.style.top = -baseTop - step * (times++) + 'px';
                 }
-            }, 60);
-            this.oldIndex = this.activeIndex;
-            this.activeIndex = current;
-
+            }, timeLang);
+            this.activeIndex = index;
         }
 
         clearTimer() {
@@ -158,9 +160,9 @@
             let maxIndex = this.picsUl.children.length;
             let that = this;
             this.timer = setInterval(() => {
-                let current = ++that.activeIndex % maxIndex;
+                let current = (that.activeIndex + 1) % maxIndex;
                 that.activeNum(current);
-                that.activePic(current);
+                that.moveTo(current);
             }, 3000);
         }
     }
