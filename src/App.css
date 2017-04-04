@@ -1,0 +1,9 @@
+div.box {
+    margin-top: 20px;
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0px;
+    width: 490px;
+    height: 170px;
+}

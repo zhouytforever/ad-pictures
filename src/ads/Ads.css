@@ -1,0 +1,16 @@
+.pic-list-box {
+  border: 5px solid coral;
+  display: block;
+  overflow: hidden;
+  width: 490px;
+  height: 170px;
+  padding: 0px;
+  border-radius: 10px;
+  margin: 0px;
+}
+
+#pic-list-ul {
+  position: relative;
+  transition: top 1s ease-out;
+  top: 0px;
+}
